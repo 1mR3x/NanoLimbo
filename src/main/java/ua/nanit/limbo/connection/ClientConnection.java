@@ -154,8 +154,14 @@ public class ClientConnection extends ChannelInboundHandlerAdapter {
             if (clientVersion.moreOrEqual(Version.V1_19_3))
                 writePacket(PacketSnapshots.PACKET_SPAWN_POSITION);
 
-            if (server.getConfig().isUsePlayerList() || clientVersion.equals(Version.V1_16_4))
-                writePacket(PacketSnapshots.PACKET_PLAYER_INFO);
+            if (!server.getConfig().isUsePlayerList() || clientVersion.equals(Version.V1_16_4)) {
+                PacketPlayerInfo info = new PacketPlayerInfo();
+                info.setUsername(this.getGameProfile().getUsername());
+                info.setGameMode(server.getConfig().getGameMode());
+                info.setUuid(this.getGameProfile().getUuid());
+
+                writePacket(info);
+            }
 
             if (clientVersion.moreOrEqual(Version.V1_13)) {
                 writePacket(PacketSnapshots.PACKET_DECLARE_COMMANDS);
